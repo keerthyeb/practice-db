@@ -1,12 +1,44 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from "react";
+import ReactDOM from "react-dom";
+import "./index.css";
+import * as serviceWorker from "./serviceWorker";
 
-ReactDOM.render(<App />, document.getElementById('root'));
+class User extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { users: [], count: 0 };
+    this.addUser = this.addUser.bind(this);
+  }
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
+  addUser(event) {
+    event.preventDefault();
+    let data = new FormData(event.target);
+    let user = data.get("name");
+
+    fetch("/addUser", {
+      method: "POST",
+      body: JSON.stringify({ user })
+    })
+      .then(res => res.text())
+      .then(resp => {
+        this.setState({ count: resp });
+      });
+  }
+
+  render() {
+    return (
+      <div>
+        <form onSubmit={this.addUser}>
+          name:
+          <input type="text" name="name" />
+          <input type="submit" value="Submit" />
+        </form>
+        <div>{this.state.users}</div>
+        <div>count : {this.state.count}</div>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<User />, document.getElementById("root"));
 serviceWorker.unregister();
